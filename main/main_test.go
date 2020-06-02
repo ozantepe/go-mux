@@ -130,7 +130,7 @@ func addProducts(count int) {
 	}
 
 	for i := 0; i < count; i++ {
-		a.DB.Exec("INSERT INTO products(name, price) VALUES($1, $2)", "Product "+strconv.Itoa(i), (i+1.0)*10)
+		a.DB.Exec("INSERT INTO products(name, price, category) VALUES($1, $2, $3)", "Product "+strconv.Itoa(i), (i+1.0)*10, "Category "+strconv.Itoa(i))
 	}
 }
 
@@ -189,8 +189,8 @@ func TestDeleteProduct(t *testing.T) {
 func TestSearchProduct(t *testing.T) {
 	clearTable()
 
-	a.DB.Exec("INSERT INTO products(name, price) VALUES($1, $2)", "productX", 600)
-	a.DB.Exec("INSERT INTO products(name, price) VALUES($1, $2)", "productY", 500)
+	a.DB.Exec("INSERT INTO products(name, price, category) VALUES($1, $2, $3)", "productX", 600, "categoryX")
+	a.DB.Exec("INSERT INTO products(name, price, category) VALUES($1, $2, $3)", "productY", 500, "categoryY")
 	expectedSize := 2
 
 	req, _ := http.NewRequest("GET", "/products/search?name=product", nil)

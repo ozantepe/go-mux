@@ -185,3 +185,25 @@ func TestDeleteProduct(t *testing.T) {
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
+
+func TestSearchProduct(t *testing.T) {
+	clearTable()
+
+	a.DB.Exec("INSERT INTO products(name, price) VALUES($1, $2)", "productX", 600)
+	a.DB.Exec("INSERT INTO products(name, price) VALUES($1, $2)", "productY", 500)
+	expectedSize := 2
+
+	req, _ := http.NewRequest("GET", "/products/search?name=product", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	var products []product
+	json.NewDecoder(response.Body).Decode(&products)
+
+	actualSize := len(products)
+	if actualSize != expectedSize {
+		t.Errorf("Expected size of the elements: %d. Got: %d\n", expectedSize, actualSize)
+	} else if products[0].Name != "productX" && products[1].Name != "productY" {
+		t.Errorf("Unexpected product names: '%s' and '%s'\n", products[0].Name, products[1].Name)
+	}
+}
